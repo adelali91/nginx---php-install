@@ -1,0 +1,62 @@
+---
+- name: install nginx
+  hosts: all
+  become: true
+
+  tasks:
+  - name: install epel
+    yum:
+      name: epel-release
+      state: present
+
+  - name: install nginx
+    yum:
+      name: nginx
+      state: present
+
+  - name:
+    service:
+      name: nginx
+      state: started
+      enabled: true
+
+- name: install php
+  hosts: all
+  become: true
+
+  tasks:
+    - name: install remi
+      yum:
+        name: http://rpms.remirepo.net/enterprise/remi-release-7.rpm
+        state: present
+
+    - name: install php
+      yum:
+        name: ["php72", "php72-php-common", "php72-php-fpm"]
+        state: present
+
+    - name: install php1
+      yum:
+        name: ["php72-php-pecl-memcache", "php72-php-pecl-memcached"]
+        state: present
+
+    - name: install php2
+      yum:
+        name: ["php72-php-gd", " php72-php-mbstring", " php72-php-mcrypt"]
+        state: present
+
+    - name: install php3
+      yum:
+        name: ["php72-php-pecl-apc", " php72-php-cli", " php72-php-pear"]
+        state: present
+
+    - name: install php4
+      yum:
+        name: ["php72-php-pdo", "php72-php-mysql", "php72-php-xml"]
+        state: present
+
+    - name: restarting
+      service:
+        name: php72-php-fpm
+        state: started
+        enabled: true

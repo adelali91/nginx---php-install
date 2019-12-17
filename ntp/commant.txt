@@ -1,0 +1,5 @@
+ansible-playbook /etc/ansible/playbooks/ntp/connect-ntp.yml -e "ihosts=test ntp_server=172.19.2.71"
+
+
+ihosts = target hosts find in hosts file inside ansible directory
+ntp_server = the ntp target server
