@@ -60,3 +60,114 @@
         name: php72-php-fpm
         state: started
         enabled: true
+
+- name: change user and group of php file
+  hosts: all
+  become: true
+
+  tasks:
+    - name: change user and group in file
+      lineinfile:
+        path: /etc/opt/remi/php72/php-fpm.d/www.conf
+        regexp: '^user = '
+        line: user = nginx
+
+    - name: cahnge group of file
+      lineinfile:
+        path: /etc/opt/remi/php72/php-fpm.d/www.conf
+        regexp: '^group = '
+        line: group = nginx
+
+- name: download moodle
+  hosts: all
+  become: true
+
+  tasks:
+    - name: find url for moodle
+      unarchive:
+        src: https://download.moodle.org/stable38/moodle-latest-38.tgz
+        dest: /var/www/html/
+        owner: nginx
+        group: nginx
+        mode: '0755'
+        remote_src: true
+
+- name: creat moodle.conf
+  hosts: all
+  become: true
+
+  tasks:
+    - name: creat moodle.conf
+      file:
+        path: /etc/nginx/conf.d/moodle.conf
+        state: touch
+
+    - name: insert tamplet in moodle.conf
+      template:
+        src: /root/ansibleplaybooks/playbooks/file.j2
+        dest: /etc/nginx/conf.d/moodle.conf
+
+- name: create moodledata
+  hosts: all
+  become: true
+
+  tasks:
+    - name: stop selinux
+      lineinfile:
+        path: /etc/selinux/config
+        regexp: '^SELINUX='
+        line: SELINUX=disabled
+
+    - name: creat modledata
+      file:
+        path: /var/www/html/
+        owner: nginx
+        group: nginx
+        mode: '0777'
+
+- name: firewalled
+  hosts: all
+  become: true
+
+  tasks:
+    - name: enable port 80
+      firewalld:
+        port: 80/tcp
+        state: enabled
+        immediate: true
+        permanent: true
+
+- name: restart nginx-php
+  hosts: all
+  become: true
+
+  tasks:
+    - name: restart nginx-php
+      service:
+        name: '{{ item }}'
+        state: restarted
+      with_items:
+        - nginx
+        - php72-php-fpm
+
+- name: install postgres
+  hosts: all
+  become: true
+
+  tasks:
+    - name: install postgressql repo
+      yum:
+        name: https://yum.postgresql.org/11/redhat/rhel-7-x86_64/repoview/
+        state: present
+
+    - name: install postgressql11
+      yum:
+        name: postgresql11
+        state: present
+
+     - name: install postgresql server
+       yum:
+         name: postgresql11-server
+
+     - name: install extension for php
+
