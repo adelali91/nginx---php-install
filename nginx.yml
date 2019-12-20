@@ -55,6 +55,11 @@
         name: ["php72-php-pdo", "php72-php-mysql", "php72-php-xml"]
         state: present
 
+    - name: install php postgres
+      yum:
+        name: php72-php-pgsql
+        state: present
+
     - name: restarting
       service:
         name: php72-php-fpm
@@ -157,7 +162,8 @@
   tasks:
     - name: install postgressql repo
       yum:
-        name: https://yum.postgresql.org/11/redhat/rhel-7-x86_64/repoview/
+        name: "https://download.postgresql.org/pub/repos/yum\
+          /reporpms/EL-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm"
         state: present
 
     - name: install postgressql11
@@ -165,9 +171,29 @@
         name: postgresql11
         state: present
 
-     - name: install postgresql server
-       yum:
-         name: postgresql11-server
+    - name: install postgresql server
+      yum:
+        name: postgresql11-server
+        state: present
 
-     - name: install extension for php
+    - name: postgresql-11-setup initdb
+      shell: /usr/pgsql-11/bin/postgresql-11-setup initdb
+      ignore_errors: true
 
+    - name: enable and start postgresql
+      service:
+        name: postgresql-11
+        state: started
+        enabled: true
+
+    - name: replace peer with trust in postgresql login (temporary)
+      lineinfile:
+        dest: /var/lib/pgsql/11/data/pg_hba.conf
+        regexp: '^local   all             all                              peer'
+        line: local   all             all                                  trust
+        backrefs: true
+
+    - name: restart postgresql service
+      service:
+        name: postgresql-11
+        state: restarted
