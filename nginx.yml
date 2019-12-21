@@ -1,6 +1,6 @@
 ---
 - name: install nginx
-  hosts: all
+  hosts: 172.19.2.116
   become: true
 
   tasks:
@@ -14,14 +14,14 @@
       name: nginx
       state: present
 
-  - name:
-    service:
-      name: nginx
-      state: started
-      enabled: true
+#  - name:
+#    service:
+#      name: nginx
+#      state: started
+#      enabled: true
 
 - name: install php
-  hosts: all
+  hosts: 172.19.2.116
   become: true
 
   tasks:
@@ -67,7 +67,7 @@
         enabled: true
 
 - name: change user and group of php file
-  hosts: all
+  hosts: 172.19.2.116
   become: true
 
   tasks:
@@ -84,10 +84,19 @@
         line: group = nginx
 
 - name: download moodle
-  hosts: all
+  hosts: 172.19.2.116
   become: true
 
   tasks:
+
+    - name: Touch again the same file, but dont change times this makes the task idempotent
+      file:
+        path: /var/www/html/
+        owner: nginx
+        group: nginx
+        mode: u+rwx,g-rw,o-r
+        state: directory
+
     - name: find url for moodle
       unarchive:
         src: https://download.moodle.org/stable38/moodle-latest-38.tgz
@@ -98,7 +107,7 @@
         remote_src: true
 
 - name: creat moodle.conf
-  hosts: all
+  hosts: 172.19.2.116
   become: true
 
   tasks:
@@ -109,11 +118,11 @@
 
     - name: insert tamplet in moodle.conf
       template:
-        src: /root/ansibleplaybooks/playbooks/file.j2
+        src: file.j2
         dest: /etc/nginx/conf.d/moodle.conf
 
 - name: create moodledata
-  hosts: all
+  hosts: 172.19.2.116
   become: true
 
   tasks:
@@ -131,7 +140,7 @@
         mode: '0777'
 
 - name: firewalled
-  hosts: all
+  hosts: 172.19.2.116
   become: true
 
   tasks:
@@ -143,7 +152,7 @@
         permanent: true
 
 - name: restart nginx-php
-  hosts: all
+  hosts: 172.19.2.116
   become: true
 
   tasks:
@@ -156,7 +165,7 @@
         - php72-php-fpm
 
 - name: install postgres
-  hosts: all
+  hosts: 172.19.2.116
   become: true
 
   tasks:
