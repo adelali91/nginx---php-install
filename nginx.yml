@@ -198,9 +198,9 @@
     - name: replace peer with trust in postgresql login (temporary)
       lineinfile:
         dest: /var/lib/pgsql/11/data/pg_hba.conf
-        regexp: '^local   all             all                              peer'
-        line: local   all             all                                  trust
-        backrefs: true
+        regexp: '^local   all             all                                     peer'
+        line: local   all             all                                     trust
+      notify: restart postgresql-11
 
     - name: restart postgresql service
       service:
