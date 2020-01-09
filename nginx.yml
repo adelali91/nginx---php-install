@@ -1,6 +1,6 @@
 ---
 - name: install nginx
-  hosts: 172.19.2.116
+  hosts: "{{hosts}}"
   become: true
 
   tasks:
@@ -21,7 +21,7 @@
 #      enabled: true
 
 - name: install php
-  hosts: 172.19.2.116
+  hosts: "{{hosts}}"
   become: true
 
   tasks:
@@ -67,7 +67,7 @@
         enabled: true
 
 - name: change user and group of php file
-  hosts: 172.19.2.116
+  hosts: "{{hosts}}"
   become: true
 
   tasks:
@@ -84,7 +84,7 @@
         line: group = nginx
 
 - name: download moodle
-  hosts: 172.19.2.116
+  hosts: "{{hosts}}"
   become: true
 
   tasks:
@@ -99,7 +99,7 @@
 
     - name: find url for moodle
       unarchive:
-        src: https://download.moodle.org/stable38/moodle-latest-38.tgz
+        src: https://download.moodle.org/stable37/moodle-latest-37.tgz
         dest: /var/www/html/
         owner: nginx
         group: nginx
@@ -107,7 +107,7 @@
         remote_src: true
 
 - name: creat moodle.conf
-  hosts: 172.19.2.116
+  hosts: "{{hosts}}"
   become: true
 
   tasks:
@@ -122,15 +122,14 @@
         dest: /etc/nginx/conf.d/moodle.conf
 
 - name: create moodledata
-  hosts: 172.19.2.116
+  hosts: "{{hosts}}"
   become: true
 
   tasks:
-    - name: stop selinux
-      lineinfile:
-        path: /etc/selinux/config
-        regexp: '^SELINUX='
-        line: SELINUX=disabled
+    - name: Put SELinux in permissive mode
+      selinux:
+        policy: targeted
+        state: permissive
 
     - name: creat modledata
       file:
@@ -140,7 +139,7 @@
         mode: '0777'
 
 - name: firewalled
-  hosts: 172.19.2.116
+  hosts: "{{hosts}}"
   become: true
 
   tasks:
@@ -152,7 +151,7 @@
         permanent: true
 
 - name: restart nginx-php
-  hosts: 172.19.2.116
+  hosts: "{{hosts}}"
   become: true
 
   tasks:
@@ -165,7 +164,7 @@
         - php72-php-fpm
 
 - name: install postgres
-  hosts: 172.19.2.116
+  hosts: "{{hosts}}"
   become: true
 
   tasks:
