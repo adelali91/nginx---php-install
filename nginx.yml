@@ -10,6 +10,8 @@
         state: permissive
 
 - name: install nginx
+  hosts: "{{hosts}}"
+  
   tasks:
   - name: install epel
     yum:
@@ -22,6 +24,8 @@
       state: present
 
 - name: download moodle
+  hosts: "{{hosts}}"
+  
   tasks:
     - name: Creat path www/html
       file:
@@ -41,6 +45,8 @@
         remote_src: true
 
 - name: configuer nginx to start moodle
+  hosts: "{{hosts}}"
+
   tasks:
     - name: creat moodle.conf
       file:
@@ -53,6 +59,8 @@
         dest: /etc/nginx/conf.d/moodle.conf
 
 - name: create moodledata
+  hosts: "{{hosts}}"
+
   tasks:
     - name: creat modledata
       file:
@@ -62,6 +70,8 @@
         mode: '0777'
 
 - name:  Configure firewalled
+  hosts: "{{hosts}}"
+
   tasks:
     - name: enable port 80
       firewalld:
@@ -71,6 +81,8 @@
         permanent: true
 
 - name: restart nginx
+  hosts: "{{hosts}}"
+
   tasks:
     - name: restart nginx-php
       service:
